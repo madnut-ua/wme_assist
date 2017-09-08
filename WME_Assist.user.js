@@ -620,7 +620,10 @@ function run_wme_assist() {
                     return text.replace(/(^| )(бульвар|бульв\.|бул\.|бул,?)( |$)/i, '$1б-р$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/(^| )(сп.|спуск|узв.)( |$)/i, '$1узвіз$3');
+                    return text.replace(/(^| )(сп\.|спуск|узв\.)( |$)/i, '$1узвіз$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/(^| )(дор\.?)( |$)/i, '$1дорога$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
                     return text.replace(/-ая/, '-а').replace(/-ий/, '-й');
