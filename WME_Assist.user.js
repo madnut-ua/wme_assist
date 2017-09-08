@@ -535,13 +535,13 @@ function run_wme_assist() {
         var rules_UA = function () {
             var isStatus = function (str) {
                 var list = ['вулиця', 'провулок', 'проспект', 'проїзд',
-                            'площа', 'шосе', 'бульвар', 'тракт'];
+                            'площа', 'шосе', 'бульвар', 'тракт', 'узвіз'];
                 if (list.indexOf(str) > -1) return true;
                 return false;
             };
 
             var isPseudoStatus = function (str) {
-                var list = ['шосе', 'тракт', 'площа', 'спуск'];
+                var list = ['шосе', 'тракт', 'площа', 'узвіз'];
                 if (list.indexOf(str) > -1) return true;
                 return false;
             };
@@ -618,6 +618,9 @@ function run_wme_assist() {
                 }),
                 new Rule('Incorrect street name', function (text) {
                     return text.replace(/(^| )(бульвар|бульв\.|бул\.|бул,?)( |$)/i, '$1б-р$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/(^| )(сп.|спуск|узв.)( |$)/i, '$1узвіз$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
                     return text.replace(/-ая/, '-а').replace(/-ий/, '-й');
