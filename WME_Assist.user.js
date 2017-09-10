@@ -626,6 +626,12 @@ function run_wme_assist() {
                     return text.replace(/(^| )(дор\.?)( |$)/i, '$1дорога$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
+                    return text.replace(/(^| )(ген\.?)( |$)/i, '$1Генерала$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/(^| )(ак\.|академика?)( |$)/i, '$1Академіка$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
                     return text.replace(/-ая/, '-а').replace(/-ий/, '-й');
                 }),
                 new Rule('Incorrect highway name', function (text) {
