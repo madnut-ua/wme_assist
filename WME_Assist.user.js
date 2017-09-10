@@ -632,6 +632,9 @@ function run_wme_assist() {
                     return text.replace(/(^| )(ак\.|академика?)( |$)/i, '$1Академіка$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
+                    return text.replace(/ и /i, ' та ');
+                }),
+                new Rule('Incorrect street name', function (text) {
                     return text.replace(/-ая/, '-а').replace(/-ий/, '-й');
                 }),
                 new Rule('Incorrect highway name', function (text) {
