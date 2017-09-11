@@ -694,15 +694,9 @@ function run_wme_assist() {
                 }),
 
                 new Rule('Fix status', function (text) {
-                    var streetReg = /вул\./i;
-                    var statusReg = /(?: |^)(просп\.|б-р|мкрн\.|наб\.|пл\.|пров\.|тракт|узвіз|[РНТМ]-[0-9]+|[EОС][0-9]+|міст|в\'їзд|виїзд|въізд|розворот|трамвай|залізниця|шосе|дорог[аи]|майдан|проїзд|заїзд|траса|тупик|до |на |> |шлях|алея|станція|завулок|квартал)(?: |$)/i;
-                    if (statusReg.test(text)) {
-                        // Remove 'вул.' if there other status names
-                        text = text.replace(streetReg, '');
-                    } else {
-                        // Add 'вул.' if it missing and no other status names
-                        if (! text.match(streetReg))
-                            text = 'вул. ' + text;
+                    var statusReg = /(?: |^)(вул\.|просп\.|б-р|мкрн\.|наб\.|пл\.|пров\.|тракт|узвіз|[РНТМ]-[0-9]+|[EОС][0-9]+|міст|в\'їзд|виїзд|въізд|розворот|трамвай|залізниця|шосе|дорог[аи]|майдан|проїзд|заїзд|траса|тупик|до |на |> |шлях|алея|станція|завулок|квартал)(?: |$)/i;
+                    if (!statusReg.test(text)) {
+                        text = 'вул. ' + text;
                     }
                     return text;
                 }, 'Moscow'),
