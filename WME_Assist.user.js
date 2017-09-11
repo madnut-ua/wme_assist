@@ -620,6 +620,9 @@ function run_wme_assist() {
                     return text.replace(/(^| )(бульвар|бульв\.|бул\.|бул,?)( |$)/i, '$1б-р$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
+                    return text.replace(/(^| )(ст\.|станция)( |$)/i, '$1станція$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
                     return text.replace(/(^| )(сп\.|спуск|узв\.)( |$)/i, '$1узвіз$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
@@ -629,13 +632,22 @@ function run_wme_assist() {
                     return text.replace(/(^| )(ген\.?)( |$)/i, '$1Генерала$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
+                    return text.replace(/(^| )(марш\.?)( |$)/i, '$1Маршала$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/(^| )(див.\.?)( |$)/i, '$1Дивізії$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
                     return text.replace(/(^| )(ак\.|академика?)( |$)/i, '$1Академіка$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
                     return text.replace(/ и /i, ' та ');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/-ая/, '-а').replace(/-ий/, '-й');
+                    return text.replace(/[,!:;]/, '');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/-[гштм]а/, '-а').replace(/-[ыоиі]й/, '-й').replace(/-тя/, '-я').replace(/-ая/, '-а');
                 }),
                 new Rule('Incorrect highway name', function (text) {
                     return text.replace(/([РрНнМмPpHM])[-\s]*([0-9]{2})/, function (a, p1, p2) {
@@ -681,10 +693,16 @@ function run_wme_assist() {
                     });
                 }),
 
-                new Rule('Add missing status', function (text) {
-                    var excludeStatus = /вул\.|просп\.|б-р|мкрн\.|наб\.|пл\.|пров\.|тракт|узвіз|[РНТМ]-[0-9]+|[EОС][0-9]+|міст|в\'їзд|виїзд|въізд|розворот|трамвай|залізниця|[Шш]осе|[Дд]орога|[Мм]айдан|проїзд|заїзд|тупик|(?: |^)до |(?: |^)на |(?: |^)> |шлях|спуск|алея|[Сс]танція|завулок|квартал/;
-                    if (! new RegExp(excludeStatus).test(text)) {
-                        text = 'вул. ' + text;
+                new Rule('Fix status', function (text) {
+                    var streetReg = /вул\./i;
+                    var statusReg = /просп\.|б-р|мкрн\.|наб\.|пл\.|пров\.|тракт|узвіз|[РНТМ]-[0-9]+|[EОС][0-9]+|міст|в\'їзд|виїзд|въізд|розворот|трамвай|залізниця|шосе|дорог[аи]|майдан|проїзд|заїзд|тупик|(?: |^)до |(?: |^)на |(?: |^)> |шлях|алея|станція|завулок|квартал/i;
+                    if (statusReg.test(text)) {
+                        // Remove 'вул.' if there other status names
+                        text = text.replace(streetReg, '');
+                    } else {
+                        // Add 'вул.' if it missing and no other status names
+                        if (! text.match(streetReg))
+                            text = 'вул. ' + text;
                     }
                     return text;
                 }, 'Moscow'),
