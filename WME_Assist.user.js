@@ -631,7 +631,7 @@ function run_wme_assist() {
                     return hasShortStatus(text) ? text : text.replace(/(^| )(дорог[аи])( |$)/i, '$1дор.$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/(^| )(сп\.|спуск|узв\.)( |$)/i, '$1узвіз$3');
+                    return text.replace(/(^| )(сп\.|спуск|узв\.|узвоз)( |$)/i, '$1узвіз$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
                     return text.replace(/(^| )(ген\.?)( |$)/i, '$1Генерала$3');
