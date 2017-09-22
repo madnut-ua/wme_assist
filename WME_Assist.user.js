@@ -533,18 +533,11 @@ function run_wme_assist() {
         };
 
         var rules_UA = function () {
-            var isStatus = function (str) {
-                var list = ['вулиця', 'провулок', 'проспект', 'проїзд',
-                            'площа', 'шосе', 'бульвар', 'тракт'];
-                if (list.indexOf(str) > -1) return true;
-                return false;
-            };
-
-            var isPseudoStatus = function (str) {
-                var list = ['шосе', 'тракт', 'площа', 'спуск'];
-                if (list.indexOf(str) > -1) return true;
-                return false;
-            };
+            var shortStatusRegex = /(?: |^)(вул\.|просп\.|мкрн\.|наб\.|пл\.|пров\.|ал\.|ст\.|пр\.|ш\.|дор\.|туп\.|б-р|р-н)(?: |$)/i;
+            var longStatusRegex = /(?: |^)(тракт|узвіз|[РНТМ](?:-[0-9]+)+|[EОС][0-9]+|міст|в\'їзд|виїзд|въізд|розворот|трамвай|залізниця|майдан|заїзд|траса|шляхопровід|до |на |> |шлях|завулок|квартал)(?: |$)/i;
+            var hasShortStatus = function(s) { return s.search(shortStatusRegex) != -1; };
+            var hasLongStatus = function(s) { return s.search(longStatusRegex) != -1; };
+            var hasStatus = function(s) { return hasShortStatus(s) || hasLongStatus(s); };
 
             var isNumber = function (str) {
                 return /([0-9])-[еай]/.test(str);
@@ -589,38 +582,77 @@ function run_wme_assist() {
                 new Rule('Incorrect apostrophe', function (text) {
                     return text.replace(/[`’]/g, '\'');
                 }),
-                new Rule('Incorrect street name', function (text) {
-                    return text.replace(/(^| )(тр-т|тракт\.)( |$)/i, '$1тракт$3');
+                new Rule('Incorrect language', function (text) {
+                    return text.replace(/(^| )(линия)( |$)/i, '$1лінія$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/(^| )(вулиц[ая]|вул,?)( |$)/i, '$1вул.$3');
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(тр-т|тракт\.)( |$)/i, '$1тракт$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/(^| )(провулок|пр\.|пер.|переулок)( |$)/i, '$1пров.$3');
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(провулок|пе?р\.|переулок)( |$)/i, '$1пров.$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/(^| )(тупік|туп[\.,])( |$)/i, '$1тупик$3');
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(туп[іи]к)( |$)/i, '$1туп.$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/(^| )(проспект|пр-т\.?)( |$)/i, '$1просп.$3');
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(проспект|пр-т\.?)( |$)/i, '$1просп.$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/(^| )(пр-д\.?)( |$)/i, '$1проїзд$3');
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(пр-д\.?|про[їе]зд)( |$)/i, '$1пр.$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/(^| )(улица|ул\.?|ул,)( |$)/i, '$1вул.$3');
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(улица|в?ул\.?|ул,|вулиц[ая])( |$)/i, '$1вул.$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/(^| )(шоссе)( |$)/i, '$1шосе$3');
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(шосс?е)( |$)/i, '$1ш.$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/(^| )(площа)( |$)/, '$1пл.$3');
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(площа)( |$)/, '$1пл.$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/(^| )(бульвар|бульв\.|бул\.|бул,?)( |$)/i, '$1б-р$3');
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(бульвар|бульв\.|бул\.|бул,?)( |$)/i, '$1б-р$3');
                 }),
                 new Rule('Incorrect street name', function (text) {
-                    return text.replace(/-ая/, '-а').replace(/-ий/, '-й');
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(станц[иі]я)( |$)/i, '$1ст.$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(алл?ея)( |$)/i, '$1ал.$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(м[іи]крорайон)( |$)/i, '$1мкрн.$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(район)( |$)/i, '$1р-н$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(набережная?)( |$)/i, '$1наб.$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return hasShortStatus(text) ? text : text.replace(/(^| )(дорог[аи])( |$)/i, '$1дор.$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/(^| )(сп\.|спуск|узв\.|узвоз)( |$)/i, '$1узвіз$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/(^| )(ген\.?)( |$)/i, '$1Генерала$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/(^| )(марш\.?)( |$)/i, '$1Маршала$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/(^| )(див.\.?)( |$)/i, '$1Дивізії$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/(^| )(ак\.|академика?)( |$)/i, '$1Академіка$3');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/ и /i, ' та ');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/[,!:;]/, '');
+                }),
+                new Rule('Incorrect street name', function (text) {
+                    return text.replace(/-[гштм]а/, '-а').replace(/-[ыоиі]й/, '-й').replace(/-тя/, '-я').replace(/-ая/, '-а');
                 }),
                 new Rule('Incorrect highway name', function (text) {
                     return text.replace(/([РрНнМмPpHM])[-\s]*([0-9]{2})/, function (a, p1, p2) {
@@ -666,9 +698,8 @@ function run_wme_assist() {
                     });
                 }),
 
-                new Rule('Add missing status', function (text) {
-                    var excludeStatus = /вул\.|просп\.|б-р|мкрн\.|наб\.|пл\.|пров\.|тракт|узвіз|[РНТМ]-[0-9]+|[EОС][0-9]+|міст|в\'їзд|виїзд|въізд|розворот|трамвай|залізниця|[Шш]осе|[Дд]орога|[Мм]айдан|проїзд|заїзд|тупик|(?: |^)до |(?: |^)на |(?: |^)> |шлях|спуск|алея|[Сс]танція|завулок|квартал/;
-                    if (! new RegExp(excludeStatus).test(text)) {
+                new Rule('Fix status', function (text) {
+                    if (!hasStatus(text)) {
                         text = 'вул. ' + text;
                     }
                     return text;
